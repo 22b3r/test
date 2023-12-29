@@ -1,8 +1,28 @@
 ---
 - hosts: all
   become: yes
+
   tasks:
-    - name: update apt packages
+    - name: Perform a safe upgrade.
       ansible.builtin.apt:
         upgrade: yes
         update_cache: yes
+
+   - name: Check if a reboot is required.
+     ansible.builtin.stat:
+       path: /var/run/reboot-required
+       get_checksum: no
+     register: reboot_required_file
+
+   - name: Reboot the server (if required).
+     ansible.builtin.reboot:
+     when: reboot_required_file.stat.exists == true
+
+   - name: Remove dependencies that are no longer required and purge their configuration files.
+     ansible.builtin.apt:
+       autoremove: yes
+       purge: true
+
+  - name: Run the equivalent of "apt-get clean" as a separate step
+    apt:
+       clean: yes
