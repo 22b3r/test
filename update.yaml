@@ -3,7 +3,7 @@
   become: yes
   tasks:
     - name: update apt packages
-       ansible.builtin.apt:
+      ansible.builtin.apt:
         upgrade: yes
         update_cache: yes
         state: latest
