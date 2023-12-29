@@ -10,8 +10,8 @@
 
    - name: Check if a reboot is required.
      ansible.builtin.stat:
-       path: /var/run/reboot-required
-       get_checksum: no
+        path: /var/run/reboot-required
+        get_checksum: no
      register: reboot_required_file
 
    - name: Reboot the server (if required).
@@ -20,9 +20,9 @@
 
    - name: Remove dependencies that are no longer required and purge their configuration files.
      ansible.builtin.apt:
-       autoremove: yes
-       purge: true
+        autoremove: yes
+        purge: true
 
   - name: Run the equivalent of "apt-get clean" as a separate step
     apt:
-       clean: yes
+        clean: yes
