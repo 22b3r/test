@@ -1,9 +1,8 @@
 ---
 - hosts: all
+  become: yes
   tasks:
     - name: update apt packages
       ansible.builtin.apt:
         upgrade: yes
         update_cache: yes
-      become: true
-      become_method: sudo
