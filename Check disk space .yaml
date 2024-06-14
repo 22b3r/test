@@ -1,0 +1,12 @@
+---
+- name: Check disk space on /dev/sda1
+  hosts: servers
+  become: yes
+  tasks:
+    - name: Run df command on /dev/sda1
+      command: df -h /dev/sda1
+      register: df_output
+
+    - name: Display df command output
+      debug:
+        var: df_output.stdout
