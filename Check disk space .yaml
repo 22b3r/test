@@ -1,6 +1,6 @@
 ---
 - name: Check disk space on /dev/sda1
-  hosts: servers
+  hosts: all
   become: yes
   tasks:
     - name: Run df command on /dev/sda1
