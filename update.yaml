@@ -3,26 +3,37 @@
   become: yes
 
   tasks:
-    - name: Perform a safe upgrade.
+    - name: Update apt cache and perform a safe upgrade
       ansible.builtin.apt:
-        upgrade: yes
         update_cache: yes
+        upgrade: dist
+        cache_valid_time: 3600
+      notify: Check for reboot
 
-    - name: Check if a reboot is required.
+    - name: Check if a reboot is required
       ansible.builtin.stat:
         path: /var/run/reboot-required
         get_checksum: no
       register: reboot_required_file
 
-    - name: Reboot the server (if required).
-      ansible.builtin.reboot:
-      when: reboot_required_file.stat.exists == true
-
-    - name: Remove dependencies that are no longer required and purge their configuration files.
+    - name: Remove unnecessary dependencies and purge their configuration files
       ansible.builtin.apt:
         autoremove: yes
-        purge: true
+        purge: yes
 
-    - name: Run the equivalent of "apt-get clean" as a separate step
-      apt:
+    - name: Clean up apt cache
+      ansible.builtin.apt:
         clean: yes
+
+  handlers:
+    - name: Check for reboot
+      ansible.builtin.debug:
+        msg: "Checking if reboot is required..."
+      when: reboot_required_file.stat.exists == true
+      notify: Reboot server
+
+    - name: Reboot server
+      ansible.builtin.reboot:
+        msg: "System needs to reboot to apply updates."
+        pre_reboot_delay: 60
+      when: reboot_required_file.stat.exists == true
